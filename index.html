@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Store</title>
+
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f8; }
+header { background:#0a7f3f; color:white; padding:15px; text-align:center; }
+.container { padding:20px; }
+
+.products {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+button {
+  background:#25D366;
+  color:white;
+  border:none;
+  padding:10px;
+  width:100%;
+  margin-top:10px;
+  cursor:pointer;
+}
+
+.cart {
+  background:white;
+  padding:15px;
+  margin-top:20px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Solar Store ☀️</h1>
+</header>
+
+<div class="container">
+
+<div class="products">
+
+<div class="card">
+<h3>200W Solar Panel</h3>
+<p>Rs.15000</p>
+<button onclick="addToCart('200W Panel',15000)">Add to Cart</button>
+</div>
+
+<div class="card">
+<h3>Inverter 1KW</h3>
+<p>Rs.30000</p>
+<button onclick="addToCart('Inverter 1KW',30000)">Add to Cart</button>
+</div>
+
+</div>
+
+<div class="cart">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<h3 id="total"></h3>
+<button onclick="checkout()">Checkout</button>
+</div>
+
+</div>
+
+<script>
+let cart = [];
+
+function addToCart(name, price){
+  cart.push({name, price});
+  renderCart();
+}
+
+function renderCart(){
+  let list = document.getElementById("cartItems");
+  let total = 0;
+  list.innerHTML = "";
+
+  cart.forEach(item=>{
+    total += item.price;
+    list.innerHTML += `<li>${item.name} - Rs.${item.price}</li>`;
+  });
+
+  document.getElementById("total").innerText = "Total: Rs."+total;
+}
+
+function checkout(){
+  let name = prompt("Your Name");
+  let phone = prompt("Phone Number");
+
+  fetch("https://YOUR-APP.onrender.com/order", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ name, phone, cart })
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    alert("Order placed!");
+    cart = [];
+    renderCart();
+  });
+}
+</script>
+
+</body>
+</html>

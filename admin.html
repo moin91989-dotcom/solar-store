@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+</head>
+<body>
+
+<h1>Orders</h1>
+<ul id="orders"></ul>
+
+<script>
+fetch("https://YOUR-APP.onrender.com/orders")
+.then(res=>res.json())
+.then(data=>{
+  let list = document.getElementById("orders");
+
+  data.forEach(order=>{
+    list.innerHTML += `
+      <li>
+        ${order.name} (${order.phone}) <br>
+        ${JSON.stringify(order.cart)}
+        <hr>
+      </li>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
