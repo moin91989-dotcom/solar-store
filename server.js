@@ -7,10 +7,12 @@ app.use(express.json());
 app.use(cors());
 
 // 🔥 MongoDB Atlas URL yahan daalna
-mongoose.connect("mongodb+srv://moin91989_db_user:<@35176504lhr>@solar-store.e0xbmce.mongodb.net/Solar Store", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+mongoose.connect(
+  "mongodb+srv://moin91989_db_user:35176504LHR@solar-store.e0xbmce.mongodb.net/solarStore?retryWrites=true&w=majority"
+)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log("Mongo Error:", err));
+
 
 // Schema
 const OrderSchema = new mongoose.Schema({
