@@ -13,6 +13,7 @@ mongoose.connect(
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log("Mongo Error:", err));
 
+  
 
 // Schema
 const OrderSchema = new mongoose.Schema({
@@ -26,6 +27,14 @@ const OrderSchema = new mongoose.Schema({
 });
 
 const Order = mongoose.model("Order", OrderSchema);
+
+const ProductSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  image: String
+});
+
+const Product = mongoose.model("Product", ProductSchema);
 
 // Save order
 app.post("/order", async (req, res) => {
@@ -42,6 +51,25 @@ app.post("/order", async (req, res) => {
 app.get("/orders", async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
   res.json(orders);
+});
+
+app.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.json([]);
+  }
+});
+
+app.post("/product", async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false });
+  }
 });
 
 // Root check
