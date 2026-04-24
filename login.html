@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 300px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #0a7f3f;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Admin Login</h2>
+
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+function login(){
+
+  fetch("https://solar-store-production.up.railway.app/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: document.getElementById("user").value,
+      password: document.getElementById("pass").value
+    })
+  })
+
+  .then(res => res.json())
+  .then(data => {
+
+    if(data.success){
+
+      // ✅ save login state
+      localStorage.setItem("admin", "true");
+
+      alert("Login successful");
+
+      // ✅ redirect to dashboard
+      window.location.href = "admin-orders.html";
+
+    } else {
+      alert("Invalid username or password");
+    }
+
+  })
+
+  .catch(err => {
+    alert("Server error");
+    console.log(err);
+  });
+
+}
+</script>
+
+</body>
+</html>
