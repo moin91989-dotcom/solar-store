@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Products</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#f5f6f8;
+  padding:20px;
+}
+
+.container {
+  max-width:400px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input {
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:1px solid #ddd;
+  border-radius:5px;
+}
+
+button {
+  width:100%;
+  padding:10px;
+  background:#0a7f3f;
+  color:white;
+  border:none;
+  cursor:pointer;
+  border-radius:5px;
+}
+
+button:hover {
+  background:#086b34;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+  <h2>➕ Add Product</h2>
+
+  <input id="name" placeholder="Product Name">
+  <input id="price" type="number" placeholder="Price">
+  <input id="image" placeholder="Image URL">
+
+  <button onclick="addProduct()">Add Product</button>
+</div>
+
+<script>
+async function addProduct(){
+
+  const name = document.getElementById("name").value.trim();
+  const price = document.getElementById("price").value;
+  const image = document.getElementById("image").value.trim();
+
+  if(!name || !price){
+    alert("Name and Price required!");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://solar-store-production.up.railway.app/product", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ name, price, image })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      alert("✅ Product Added!");
+      document.getElementById("name").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("image").value = "";
+    } else {
+      alert("❌ Failed to add product");
+    }
+
+  } catch(err){
+    alert("Server error!");
+  }
+}
+</script>
+
+</body>
+</html>
