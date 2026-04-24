@@ -6,76 +6,124 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 🔥 MongoDB Atlas URL yahan daalna
-mongoose.connect(
-  "mongodb+srv://moin91989_db_user:35176504LHR@solar-store.e0xbmce.mongodb.net/solarStore?retryWrites=true&w=majority"
-)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log("Mongo Error:", err));
+// =======================
+// 🔥 MONGO DB CONNECTION
+// =======================
+const MONGO_URI =
+  "mongodb+srv://moin91989_db_user:35176504LHR@solar-store.e0xbmce.mongodb.net/solarStore?retryWrites=true&w=majority";
 
-  
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log("Mongo Error:", err));
 
-// Schema
+// =======================
+// 📦 SCHEMAS
+// =======================
 const OrderSchema = new mongoose.Schema({
   name: String,
   phone: String,
   cart: Array,
+  status: {
+    type: String,
+    default: "Pending",
+  },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
-
-const Order = mongoose.model("Order", OrderSchema);
 
 const ProductSchema = new mongoose.Schema({
   name: String,
   price: Number,
-  image: String
+  image: String,
 });
 
+const Order = mongoose.model("Order", OrderSchema);
 const Product = mongoose.model("Product", ProductSchema);
 
-// Save order
+// =======================
+// 🛒 ORDER ROUTES
+// =======================
+
+// Create Order
 app.post("/order", async (req, res) => {
   try {
     const order = new Order(req.body);
     await order.save();
     res.json({ success: true, message: "Order saved" });
   } catch (err) {
-    res.json({ success: false, message: "Error saving order" });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// Get orders (admin)
+// Get Orders
 app.get("/orders", async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
-  res.json(orders);
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json([]);
+  }
 });
 
+// Update Order Status
+app.put("/order/:id", async (req, res) => {
+  try {
+    await Order.findByIdAndUpdate(req.params.id, {
+      status: req.body.status,
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// Delete Order
+app.delete("/order/:id", async (req, res) => {
+  try {
+    await Order.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// =======================
+// 🛍️ PRODUCT ROUTES
+// =======================
+
+// Get Products
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products);
   } catch (err) {
-    res.json([]);
+    res.status(500).json([]);
   }
 });
 
+// Add Product
 app.post("/product", async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
     res.json({ success: true });
   } catch (err) {
-    res.json({ success: false });
+    res.status(500).json({ success: false });
   }
 });
 
-// Root check
+// =======================
+// 🌐 ROOT
+// =======================
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
+// =======================
+// 🚀 START SERVER
+// =======================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server running"));
+app.listen(PORT, () => console.log("Server running on port", PORT));
