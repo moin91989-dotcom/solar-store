@@ -1,29 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Panel</title>
+<title>Admin Orders</title>
+
+<style>
+body { font-family: Arial; background:#f5f6f8; margin:20px; }
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+button {
+  background:#0a7f3f;
+  color:white;
+  border:none;
+  padding:10px 15px;
+  cursor:pointer;
+  border-radius:5px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+pre {
+  background:#f4f4f4;
+  padding:10px;
+  border-radius:5px;
+  overflow:auto;
+}
+</style>
+
 </head>
+
 <body>
 
-<h1>Orders</h1>
-<ul id="orders"></ul>
+<div class="header">
+  <h1>📦 Orders Dashboard</h1>
+  <button onclick="loadOrders()">🔄 Refresh</button>
+</div>
+
+<div id="orders">Loading orders...</div>
 
 <script>
-fetch("https://YOUR-APP.onrender.com/orders")
-.then(res=>res.json())
-.then(data=>{
-  let list = document.getElementById("orders");
+async function loadOrders(){
+  const container = document.getElementById("orders");
+  container.innerHTML = "Loading...";
 
-  data.forEach(order=>{
-    list.innerHTML += `
-      <li>
-        ${order.name} (${order.phone}) <br>
-        ${JSON.stringify(order.cart)}
-        <hr>
-      </li>
-    `;
-  });
-});
+  try {
+    const res = await fetch("https://solar-store-production.up.railway.app/orders");
+    const data = await res.json();
+
+    if (!data.length) {
+      container.innerHTML = "<p>No orders found</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(order => {
+      container.innerHTML += `
+        <div class="card">
+          <h3>👤 ${order.name}</h3>
+          <p>📞 ${order.phone}</p>
+          <p>📌 Status: <b>${order.status || "Pending"}</b></p>
+          <p>🛒 Items:</p>
+          <pre>${JSON.stringify(order.cart, null, 2)}</pre>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    container.innerHTML = "Error loading orders";
+  }
+}
+
+// first load
+loadOrders();
 </script>
 
 </body>
